@@ -190,6 +190,13 @@ countries_sf %>%
   st_transform(crs = "+proj=moll +datum=WGS84") %>% 
   plot(key.pos = NULL, graticule = TRUE, main = "South America")
 
+countries_sf %>% 
+  filter(continent == "Europe") %>% 
+  filter(subregion != "Eastern Europe") %>%
+  select(name) %>% 
+  st_transform(crs = "+proj=moll +datum=WGS84") %>% 
+  plot(key.pos = NULL, graticule = TRUE, main = "Europa")
+
 # Map of France
 france_sf %>% 
   select(name) %>% 
@@ -225,7 +232,7 @@ ggplot() +
           show.legend = "point") + coord_sf(xlim = c(-1, 14), ylim = c(44, 55))
 
 # load a shapefile and plot
-sh = st_read("~/Downloads/CONTOURS-IRIS_2-1__SHP__FRA_2018-06-08/CONTOURS-IRIS/1_DONNEES_LIVRAISON_2018-06-00105/CONTOURS-IRIS_2-1_SHP_LAMB93_FXX-2017/CONTOURS-IRIS.shp",stringsAsFactors=FALSE)
+sh = st_read(file.path("data","CONTOURS-IRIS","1_DONNEES_LIVRAISON_2018-06-00105","CONTOURS-IRIS_2-1_SHP_LAMB93_FXX-2017","CONTOURS-IRIS.shp"),stringsAsFactors=FALSE)
 sh_lalo = st_transform(sh,crs = 4326)
 # paris
 p = sh_lalo %>%
@@ -283,19 +290,6 @@ ggplot(p_arr) + geom_sf(aes(fill=NULL)) + geom_sf(data=st_geometry(st_centroid(p
 
 # generate a fake population weights dataset
 p_arr$weights = sample(1:20,size=20,replace=FALSE)
-
-
-weights$jobs = sample(100:2000, size=20,replace=FALSE)
-centroids = st_centroid(st_geometry(weights))
-sp = as(centroids,'Spatial')
-sdf = SpatialPointsDataFrame(sp,data.frame(weights=weights$jobs))
-library(spatialEco)
-wtd.center = wt.centroid(sdf, "weights")
-wtd.center_sf = st_as_sf(wtd.center)
-
-plot(st_geometry(p_arr))
-plot(st_geometry(wtd.center_sf),pch=3,col="red",add=TRUE)
-plot(st_centroid(st_geometry(p_arr)),pch=3,col="blue",add=TRUE)
 
 wtc <- function(g,w){
   if (!(is(g,"sf")) | !(w %in% colnames(g))){
